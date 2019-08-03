@@ -21,6 +21,20 @@ func New(strict bool, dict map[string]interface{}) *Container {
 	}
 }
 
+// Determine if container is strict
+func (c *Container) IsStrict() bool {
+	return c.strict
+}
+
+// Determine if item exists in container by name
+func (c *Container) Has(name string) (ok bool) {
+	c.mux.RLock()
+	_, ok = c.d[name]
+	c.mux.RUnlock()
+
+	return ok
+}
+
 // Set item in the container by name
 // If the container is strict, attempting to set multiple items
 // with the same name will result in an error w/o a set operation

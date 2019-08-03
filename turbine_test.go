@@ -6,6 +6,83 @@ import (
 	"testing"
 )
 
+func TestContainer_IsStrict(t *testing.T) {
+	tests := []struct {
+		name string
+		c    *turbine.Container
+		want bool
+	}{
+		{
+			name: "strict is false",
+			c:    turbine.New(false, map[string]interface{}{}),
+			want: false,
+		},
+		{
+			name: "strict is true",
+			c:    turbine.New(true, map[string]interface{}{}),
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if result := tt.c.IsStrict(); result != tt.want {
+				t.Errorf("Container.IsStrict() = %v, want %v", result, tt.want)
+			}
+		})
+	}
+}
+
+func TestContainer_Has(t *testing.T) {
+	type args struct {
+		name string
+	}
+
+	tests := []struct {
+		name string
+		c    *turbine.Container
+		args args
+		want bool
+	}{
+		{
+			name: "Has item should be true",
+			c: turbine.New(false, map[string]interface{}{
+				"foo": "bar",
+			}),
+			args: args{
+				name: "foo",
+			},
+			want: true,
+		},
+		{
+			name: "Container with no items and Has(name) call should be false",
+			c:    turbine.New(false, map[string]interface{}{}),
+			args: args{
+				name: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "Container with items but no item with name should be false",
+			c: turbine.New(false, map[string]interface{}{
+				"foo": "bar",
+			}),
+			args: args{
+				"bar",
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if val := tt.c.Has(tt.args.name); val != tt.want {
+				t.Errorf("Container.Has(\"%s\") = %v, want %v", tt.args.name, val, tt.want)
+			}
+		})
+	}
+}
+
 func TestContainer_Set(t *testing.T) {
 	type args struct {
 		name string
