@@ -24,9 +24,7 @@ func New(strict bool, dict map[string]interface{}) *Container {
 // Set item in the container by name
 // If the container is strict, attempting to set multiple items
 // with the same name will result in an error w/o a set operation
-func (c *Container) Set(name string, item interface{}) error {
-	var err error
-
+func (c *Container) Set(name string, item interface{}) (err error) {
 	if c.d == nil {
 		c.d = make(map[string]interface{})
 	}
