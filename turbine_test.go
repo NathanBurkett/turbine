@@ -19,7 +19,7 @@ func TestContainer_Set(t *testing.T) {
 	}{
 		{
 			name: "Handles setting successfully",
-			c: &turbine.Container{},
+			c:    &turbine.Container{},
 			args: []args{
 				{
 					name: "foo",
@@ -72,7 +72,7 @@ func TestContainer_Get(t *testing.T) {
 				name: "foo",
 			},
 			wantItem: "bar",
-			wantOk: true,
+			wantOk:   true,
 		},
 		{
 			name: "Handles getting successfully but item does not exist",
@@ -83,7 +83,7 @@ func TestContainer_Get(t *testing.T) {
 				name: "bar",
 			},
 			wantItem: nil,
-			wantOk: false,
+			wantOk:   false,
 		},
 	}
 	for _, tt := range tests {
