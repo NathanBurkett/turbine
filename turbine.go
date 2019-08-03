@@ -6,9 +6,10 @@ import (
 )
 
 type Container struct {
+	_   interface{}
 	mux sync.RWMutex
 
-	d map[string]interface{}
+	d      map[string]interface{}
 	strict bool
 }
 
@@ -16,7 +17,7 @@ type Container struct {
 func New(strict bool, dict map[string]interface{}) *Container {
 	return &Container{
 		strict: strict,
-		d: dict,
+		d:      dict,
 	}
 }
 
