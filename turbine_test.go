@@ -14,12 +14,12 @@ func TestContainer_IsStrict(t *testing.T) {
 	}{
 		{
 			name: "strict is false",
-			c:    turbine.New(false, map[string]interface{}{}),
+			c:    turbine.New(false, turbine.BindingMap{}),
 			want: false,
 		},
 		{
 			name: "strict is true",
-			c:    turbine.New(true, map[string]interface{}{}),
+			c:    turbine.New(true, turbine.BindingMap{}),
 			want: true,
 		},
 	}
@@ -46,8 +46,13 @@ func TestContainer_Has(t *testing.T) {
 	}{
 		{
 			name: "Has item should be true",
-			c: turbine.New(false, map[string]interface{}{
-				"foo": "bar",
+			c: turbine.New(false, turbine.BindingMap{
+				"foo": {
+					Name: "foo",
+					Resolution: func (c *turbine.Container) interface{} {
+						return "foo"
+					},
+				},
 			}),
 			args: args{
 				name: "foo",
@@ -56,7 +61,7 @@ func TestContainer_Has(t *testing.T) {
 		},
 		{
 			name: "Container with no items and Has(name) call should be false",
-			c:    turbine.New(false, map[string]interface{}{}),
+			c:    turbine.New(false, turbine.BindingMap{}),
 			args: args{
 				name: "foo",
 			},
@@ -64,8 +69,11 @@ func TestContainer_Has(t *testing.T) {
 		},
 		{
 			name: "Container with items but no item with name should be false",
-			c: turbine.New(false, map[string]interface{}{
-				"foo": "bar",
+			c: turbine.New(false, turbine.BindingMap{
+				"foo": {
+					Name: "foo",
+					Resolution: "bar",
+				},
 			}),
 			args: args{
 				"bar",
@@ -85,8 +93,7 @@ func TestContainer_Has(t *testing.T) {
 
 func TestContainer_Set(t *testing.T) {
 	type args struct {
-		name string
-		item interface{}
+		b turbine.Binding
 	}
 	tests := []struct {
 		name    string
@@ -99,12 +106,18 @@ func TestContainer_Set(t *testing.T) {
 			c:    &turbine.Container{},
 			args: []args{
 				{
-					name: "foo",
-					item: "bar",
+					b: turbine.Binding{
+						Name: "foo",
+						Resolution: "bar",
+					},
 				},
 				{
-					name: "bar",
-					item: "baz",
+					b: turbine.Binding{
+						Name: "foo",
+						Resolution: func (c *turbine.Container) interface{} {
+							return "bar"
+						},
+					},
 				},
 			},
 			wantErr: false,
@@ -115,7 +128,7 @@ func TestContainer_Set(t *testing.T) {
 			var err error
 
 			for _, arg := range tt.args {
-				val := tt.c.Set(arg.name, arg.item)
+				val := tt.c.Set(arg.b)
 
 				if val != nil {
 					err = val
@@ -142,8 +155,8 @@ func TestContainer_Get(t *testing.T) {
 	}{
 		{
 			name: "Handles getting successfully",
-			c: turbine.New(false, map[string]interface{}{
-				"foo": "bar",
+			c: turbine.New(false, turbine.BindingMap{
+				"foo": turbine.NewBinding("foo", "bar"),
 			}),
 			args: args{
 				name: "foo",
@@ -152,9 +165,9 @@ func TestContainer_Get(t *testing.T) {
 			wantOk:   true,
 		},
 		{
-			name: "Handles getting successfully but item does not exist",
-			c: turbine.New(false, map[string]interface{}{
-				"foo": "bar",
+			name: "Handles getting but item does not exist",
+			c: turbine.New(false, turbine.BindingMap{
+				"foo": turbine.NewBinding("foo", "bar"),
 			}),
 			args: args{
 				name: "bar",
