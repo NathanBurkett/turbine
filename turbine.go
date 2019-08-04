@@ -9,7 +9,7 @@ type Container struct {
 	_   interface{}
 	mux sync.RWMutex
 
-	d      map[string]interface{}
+	dict   map[string]interface{}
 	strict bool
 }
 
@@ -17,7 +17,7 @@ type Container struct {
 func New(strict bool, dict map[string]interface{}) *Container {
 	return &Container{
 		strict: strict,
-		d:      dict,
+		dict:      dict,
 	}
 }
 
@@ -29,7 +29,7 @@ func (c *Container) IsStrict() bool {
 // Determine if item exists in container by name
 func (c *Container) Has(name string) (ok bool) {
 	c.mux.RLock()
-	_, ok = c.d[name]
+	_, ok = c.dict[name]
 	c.mux.RUnlock()
 
 	return ok
@@ -40,8 +40,8 @@ func (c *Container) Has(name string) (ok bool) {
 // with the same name will result in an error with no item bound
 // into the container
 func (c *Container) Set(name string, item interface{}) (err error) {
-	if c.d == nil {
-		c.d = make(map[string]interface{})
+	if c.dict == nil {
+		c.dict = make(map[string]interface{})
 	}
 
 	c.mux.Lock()
@@ -52,11 +52,11 @@ func (c *Container) Set(name string, item interface{}) (err error) {
 }
 
 func (c *Container) handleSet(name string, item interface{}) error {
-	if c.strict && c.d[name] != nil {
+	if c.strict && c.dict[name] != nil {
 		return fmt.Errorf("%s already exists", name)
 	}
 
-	c.d[name] = item
+	c.dict[name] = item
 
 	return nil
 }
@@ -65,7 +65,7 @@ func (c *Container) handleSet(name string, item interface{}) error {
 // into the container, 'ok' will be false
 func (c *Container) Get(name string) (item interface{}, ok bool) {
 	c.mux.RLock()
-	item, ok = c.d[name]
+	item, ok = c.dict[name]
 	c.mux.RUnlock()
 
 	return item, ok
